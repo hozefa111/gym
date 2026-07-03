@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { Workout, WorkoutExercise, Set } from '../types/workout';
 import { db } from '../lib/db';
 import { v4 as uuidv4 } from 'uuid';
+import { calculateCalories } from '../lib/calories';
+import { useProfileStore } from './useProfileStore';
 
 interface WorkoutState {
   activeWorkout: Workout | null;
@@ -38,9 +40,14 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const { activeWorkout } = get();
     if (!activeWorkout) return;
     
+    // Calculate calories
+    const profile = useProfileStore.getState().profile;
+    const caloriesBurned = profile ? calculateCalories(activeWorkout, profile) : 0;
+    
     const completedWorkout = {
       ...activeWorkout,
       endTime: new Date().toISOString(),
+      caloriesBurned,
     };
     
     // Save to dexie
