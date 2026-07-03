@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useWorkoutStore } from '@/stores/useWorkoutStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronDown, Plus, Check, X, Timer } from 'lucide-react';
+import { Plus, Check, X, Timer } from 'lucide-react';
 import { exercises } from '@/data/exercises';
 import { ExerciseModal } from './ExerciseModal';
 
@@ -13,7 +13,6 @@ export function ActiveWorkout() {
     endWorkout, 
     cancelWorkout, 
     addSet, 
-    removeSet, 
     updateSet, 
     toggleSetComplete,
     addExercise,
@@ -53,7 +52,7 @@ export function ActiveWorkout() {
           </p>
         </div>
 
-        {activeWorkout.exercises.map((workoutEx, index) => {
+        {activeWorkout.exercises.map((workoutEx) => {
           const exerciseDetails = exercises.find((e) => e.id === workoutEx.exerciseId);
           return (
             <div key={workoutEx.id} className="space-y-3">
