@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useWorkoutStore } from '@/stores/useWorkoutStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Check, X, Timer } from 'lucide-react';
+import { Plus, Check, X, Timer, Trash2 } from 'lucide-react';
 import { exercises } from '@/data/exercises';
 import { ExerciseModal } from './ExerciseModal';
 
@@ -21,6 +21,7 @@ export function ActiveWorkout() {
   
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
   const [elapsedTime, setElapsedTime] = useState('00:00');
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   useEffect(() => {
     if (!activeWorkout?.startTime) return;
@@ -30,9 +31,10 @@ export function ActiveWorkout() {
       const now = new Date().getTime();
       const diff = Math.floor((now - start) / 1000);
       
-      const mins = Math.floor(diff / 60).toString().padStart(2, '0');
+      const hrs = Math.floor(diff / 3600);
+      const mins = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
       const secs = (diff % 60).toString().padStart(2, '0');
-      setElapsedTime(`${mins}:${secs}`);
+      setElapsedTime(hrs > 0 ? `${hrs}:${mins}:${secs}` : `${mins}:${secs}`);
     }, 1000);
     
     return () => clearInterval(interval);
@@ -48,9 +50,27 @@ export function ActiveWorkout() {
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       className="fixed inset-0 z-[60] bg-background flex flex-col safe-area-bottom"
     >
+      {/* Cancel Confirmation Overlay */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 z-[70] bg-black/60 flex items-center justify-center p-6">
+          <div className="bg-card rounded-xl p-6 w-full max-w-sm space-y-4 border">
+            <h3 className="text-xl font-bold">Discard Workout?</h3>
+            <p className="text-muted-foreground text-sm">All logged sets will be lost. This cannot be undone.</p>
+            <div className="flex gap-3">
+              <Button variant="secondary" className="flex-1" onClick={() => setShowCancelConfirm(false)}>
+                Keep Going
+              </Button>
+              <Button variant="destructive" className="flex-1" onClick={() => { cancelWorkout(); setShowCancelConfirm(false); }}>
+                Discard
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between p-4 border-b bg-card">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={cancelWorkout} className="text-destructive">
+          <Button variant="ghost" size="icon" onClick={() => setShowCancelConfirm(true)} className="text-destructive">
             <X className="w-6 h-6" />
           </Button>
           <Timer className="w-5 h-5 text-primary ml-2" />
@@ -69,6 +89,13 @@ export function ActiveWorkout() {
           </p>
         </div>
 
+        {activeWorkout.exercises.length === 0 && (
+          <div className="text-center py-10 text-muted-foreground">
+            <p className="text-lg mb-2">No exercises yet</p>
+            <p className="text-sm">Tap "Add Exercise" below to get started!</p>
+          </div>
+        )}
+
         {activeWorkout.exercises.map((workoutEx) => {
           const exerciseDetails = exercises.find((e) => e.id === workoutEx.exerciseId);
           return (
@@ -78,7 +105,7 @@ export function ActiveWorkout() {
                   {exerciseDetails?.name || 'Unknown Exercise'}
                 </h3>
                 <Button variant="ghost" size="icon" onClick={() => removeExercise(workoutEx.id)}>
-                  <X className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4 text-destructive" />
                 </Button>
               </div>
 

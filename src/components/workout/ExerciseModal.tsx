@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Plus } from 'lucide-react';
+import { Search, X, Plus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { exercises } from '@/data/exercises';
@@ -13,11 +13,30 @@ interface ExerciseModalProps {
 
 export function ExerciseModal({ isOpen, onClose, onAddExercise }: ExerciseModalProps) {
   const [search, setSearch] = useState('');
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
   const filteredExercises = exercises.filter((ex) =>
     ex.name.toLowerCase().includes(search.toLowerCase()) ||
     ex.primaryMuscle.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleAdd = (id: string) => {
+    onAddExercise(id);
+    setAddedIds(prev => new Set(prev).add(id));
+    setTimeout(() => {
+      setAddedIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }, 1500);
+  };
+
+  const handleClose = () => {
+    setSearch('');
+    setAddedIds(new Set());
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -31,7 +50,7 @@ export function ExerciseModal({ isOpen, onClose, onAddExercise }: ExerciseModalP
         >
           <div className="flex items-center justify-between p-4 border-b">
             <h2 className="text-xl font-bold">Add Exercise</h2>
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button variant="ghost" size="icon" onClick={handleClose}>
               <X className="w-6 h-6" />
             </Button>
           </div>
@@ -49,24 +68,24 @@ export function ExerciseModal({ isOpen, onClose, onAddExercise }: ExerciseModalP
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {filteredExercises.map((ex) => (
-              <div
-                key={ex.id}
-                className="flex items-center justify-between p-4 rounded-lg bg-card border hover:border-primary/50 transition-colors"
-                onClick={() => {
-                  onAddExercise(ex.id);
-                  onClose();
-                }}
-              >
-                <div>
-                  <h3 className="font-semibold text-lg">{ex.name}</h3>
-                  <p className="text-sm text-muted-foreground">{ex.primaryMuscle}</p>
+            {filteredExercises.map((ex) => {
+              const justAdded = addedIds.has(ex.id);
+              return (
+                <div
+                  key={ex.id}
+                  className="flex items-center justify-between p-4 rounded-lg bg-card border hover:border-primary/50 transition-colors"
+                  onClick={() => !justAdded && handleAdd(ex.id)}
+                >
+                  <div>
+                    <h3 className="font-semibold text-lg">{ex.name}</h3>
+                    <p className="text-sm text-muted-foreground">{ex.primaryMuscle} · {ex.equipment}</p>
+                  </div>
+                  <Button size="icon" variant={justAdded ? 'default' : 'secondary'} className="rounded-full">
+                    {justAdded ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                  </Button>
                 </div>
-                <Button size="icon" variant="secondary" className="rounded-full">
-                  <Plus className="w-5 h-5" />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
             
             {filteredExercises.length === 0 && (
               <div className="text-center text-muted-foreground py-10">

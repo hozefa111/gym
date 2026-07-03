@@ -1,20 +1,24 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play } from 'lucide-react';
+import { Play, Dumbbell, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
+import { useWorkoutStore } from '@/stores/useWorkoutStore';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const startWorkout = useWorkoutStore((state) => state.startWorkout);
   
   const workouts = useLiveQuery(() => db.workouts.toArray());
   
   const totalWorkouts = workouts?.length || 0;
   
   let totalVolume = 0;
+  let totalCalories = 0;
   workouts?.forEach(workout => {
+    totalCalories += workout.caloriesBurned || 0;
     workout.exercises.forEach(ex => {
       ex.sets.forEach(set => {
         if (set.completed && set.weight && set.reps) {
@@ -25,6 +29,10 @@ export function DashboardPage() {
   });
 
   const displayVolume = totalVolume > 1000 ? (totalVolume / 1000).toFixed(1) + 'k' : totalVolume.toString();
+
+  const handleQuickStart = () => {
+    startWorkout();
+  };
 
   return (
     <motion.div
@@ -40,30 +48,49 @@ export function DashboardPage() {
 
       <Card className="bg-primary/5 border-primary/20">
         <CardHeader>
-          <CardTitle>Next Workout</CardTitle>
-          <CardDescription>Upper Body Power</CardDescription>
+          <CardTitle>Quick Start</CardTitle>
+          <CardDescription>Jump right into a new workout session</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full gap-2" onClick={() => navigate('/workout')}>
+        <CardContent className="flex gap-3">
+          <Button className="flex-1 gap-2 h-12" onClick={handleQuickStart}>
             <Play className="w-4 h-4" /> Start Workout
+          </Button>
+          <Button variant="secondary" className="flex-1 gap-2 h-12" onClick={() => navigate('/workout')}>
+            <Dumbbell className="w-4 h-4" /> Routines
           </Button>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card>
-          <CardHeader className="p-4 pb-2">
-            <CardDescription>Workouts</CardDescription>
-            <CardTitle className="text-2xl">{workouts ? totalWorkouts : '--'}</CardTitle>
-          </CardHeader>
+      {totalWorkouts === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="p-6 text-center space-y-2">
+            <TrendingUp className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
+            <h3 className="font-semibold text-lg">No workouts yet</h3>
+            <p className="text-sm text-muted-foreground">Complete your first workout to see your stats here!</p>
+          </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="p-4 pb-2">
-            <CardDescription>Volume (kg)</CardDescription>
-            <CardTitle className="text-2xl">{workouts ? displayVolume : '--'}</CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-3">
+          <Card>
+            <CardHeader className="p-3 pb-1">
+              <CardDescription className="text-xs">Workouts</CardDescription>
+              <CardTitle className="text-xl">{totalWorkouts}</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="p-3 pb-1">
+              <CardDescription className="text-xs">Volume</CardDescription>
+              <CardTitle className="text-xl">{displayVolume}kg</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="p-3 pb-1">
+              <CardDescription className="text-xs">Calories</CardDescription>
+              <CardTitle className="text-xl">{totalCalories}</CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+      )}
     </motion.div>
   );
 }

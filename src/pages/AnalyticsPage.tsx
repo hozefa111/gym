@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { exercises as exerciseLibrary } from '@/data/exercises';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Flame, Calendar, Target } from 'lucide-react';
+import { Target } from 'lucide-react';
 
 export function AnalyticsPage() {
   const workouts = useLiveQuery(() => db.workouts.toArray());
@@ -55,26 +55,34 @@ export function AnalyticsPage() {
         <p className="text-muted-foreground">Track your progress over the last 7 days.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         <Card className="bg-primary/5 border-primary/20">
-          <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
-            <CardDescription className="font-semibold text-primary">Workouts</CardDescription>
-            <Calendar className="w-4 h-4 text-primary" />
+          <CardHeader className="p-3 pb-1">
+            <CardDescription className="text-xs font-semibold text-primary">Workouts</CardDescription>
           </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <CardTitle className="text-3xl">{weeklyWorkouts.length}</CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">Last 7 days</p>
+          <CardContent className="p-3 pt-0">
+            <CardTitle className="text-2xl">{weeklyWorkouts.length}</CardTitle>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Last 7 days</p>
           </CardContent>
         </Card>
 
         <Card className="bg-primary/5 border-primary/20">
-          <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
-            <CardDescription className="font-semibold text-primary">Calories</CardDescription>
-            <Flame className="w-4 h-4 text-primary" />
+          <CardHeader className="p-3 pb-1">
+            <CardDescription className="text-xs font-semibold text-primary">Calories</CardDescription>
           </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <CardTitle className="text-3xl">{weeklyCalories} kcal</CardTitle>
-            <p className="text-xs text-muted-foreground mt-1 font-mono">Burned</p>
+          <CardContent className="p-3 pt-0">
+            <CardTitle className="text-2xl">{weeklyCalories}</CardTitle>
+            <p className="text-[10px] text-muted-foreground mt-0.5">kcal burned</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-primary/5 border-primary/20">
+          <CardHeader className="p-3 pb-1">
+            <CardDescription className="text-xs font-semibold text-primary">Volume</CardDescription>
+          </CardHeader>
+          <CardContent className="p-3 pt-0">
+            <CardTitle className="text-2xl">{weeklyVolume > 1000 ? (weeklyVolume / 1000).toFixed(1) + 'k' : weeklyVolume}</CardTitle>
+            <p className="text-[10px] text-muted-foreground mt-0.5">kg lifted</p>
           </CardContent>
         </Card>
       </div>

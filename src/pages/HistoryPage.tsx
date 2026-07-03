@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Clock, Dumbbell } from 'lucide-react';
+import { Calendar, Clock, Dumbbell, Flame } from 'lucide-react';
 
 export function HistoryPage() {
   const workouts = useLiveQuery(() => db.workouts.orderBy('date').reverse().toArray());
@@ -69,6 +69,12 @@ export function HistoryPage() {
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-mono">
                     <span className="font-medium text-foreground">{totalVolume}kg</span>
                   </div>
+                  {workout.caloriesBurned ? (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Flame className="w-4 h-4 text-orange-400" />
+                      <span className="font-medium text-foreground">{workout.caloriesBurned}</span>
+                    </div>
+                  ) : null}
                 </CardContent>
               </Card>
             );

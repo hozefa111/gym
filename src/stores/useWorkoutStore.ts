@@ -26,12 +26,20 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   activeWorkout: null,
 
   startWorkout: (template) => {
+    let exercises: WorkoutExercise[] = [];
+    if (template) {
+      exercises = template.exercises.map(ex => ({
+        ...ex,
+        id: uuidv4(),
+        sets: ex.sets.map(s => ({ ...s, id: uuidv4() })),
+      }));
+    }
     const newWorkout: Workout = {
       id: uuidv4(),
       name: template ? template.name : 'New Workout',
       date: new Date().toISOString(),
       startTime: new Date().toISOString(),
-      exercises: template ? JSON.parse(JSON.stringify(template.exercises)) : [],
+      exercises,
     };
     set({ activeWorkout: newWorkout });
   },
