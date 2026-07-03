@@ -2,8 +2,11 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function DashboardPage() {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -22,7 +25,7 @@ export function DashboardPage() {
           <CardDescription>Upper Body Power</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button className="w-full gap-2">
+          <Button className="w-full gap-2" onClick={() => navigate('/workout')}>
             <Play className="w-4 h-4" /> Start Workout
           </Button>
         </CardContent>
