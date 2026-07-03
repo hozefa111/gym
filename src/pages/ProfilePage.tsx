@@ -3,15 +3,13 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast'; // Wait, let's see if we have toast or we can just use normal feedback.
-// Let's use simple local state feedback instead of useToast since we don't know if toast is configured.
 import { useState } from 'react';
 
 export function ProfilePage() {
   const { profile, updateProfile } = useProfileStore();
   const [name, setName] = useState(profile?.name || '');
   const [weight, setWeight] = useState(profile?.weight || 70);
-  const [weightUnit, setWeightUnit] = useState(profile?.weightUnit || 'kg');
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(profile?.weightUnit || 'kg');
   const [restTimer, setRestTimer] = useState(profile?.restTimerDefault || 90);
   const [saved, setSaved] = useState(false);
 
@@ -24,7 +22,7 @@ export function ProfilePage() {
     await updateProfile({
       name,
       weight: Number(weight),
-      weightUnit: weightUnit as 'kg' | 'lbs',
+      weightUnit,
       restTimerDefault: Number(restTimer),
     });
     setSaved(true);
@@ -65,7 +63,7 @@ export function ProfilePage() {
                 <select 
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   value={weightUnit} 
-                  onChange={(e) => setWeightUnit(e.target.value)}
+                  onChange={(e) => setWeightUnit(e.target.value as 'kg' | 'lbs')}
                 >
                   <option value="kg">kg</option>
                   <option value="lbs">lbs</option>

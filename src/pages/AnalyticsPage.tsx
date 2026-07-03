@@ -3,9 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { exercises as exerciseLibrary } from '@/data/exercises';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress'; // Wait, let's see if we have progress component, otherwise build a simple HTML one.
-// Let's build a simple custom progress bar with Tailwind for safety.
-import { Dumbbell, Flame, Calendar, Target } from 'lucide-react';
+import { Flame, Calendar, Target } from 'lucide-react';
 
 export function AnalyticsPage() {
   const workouts = useLiveQuery(() => db.workouts.toArray());
