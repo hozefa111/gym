@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { BottomNav } from './BottomNav';
 import { AnimatePresence } from 'framer-motion';
+import { ActiveWorkout } from '../workout/ActiveWorkout';
 
 export function AppShell() {
   const location = useLocation();
@@ -17,6 +18,7 @@ export function AppShell() {
         </AnimatePresence>
       </main>
       <BottomNav />
+      <ActiveWorkout />
     </div>
   );
 }

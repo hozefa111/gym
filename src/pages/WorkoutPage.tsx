@@ -3,8 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Plus, Play } from 'lucide-react';
 import { defaultTemplates } from '@/data/splits';
+import { useWorkoutStore } from '@/stores/useWorkoutStore';
+import { Workout } from '@/types/workout';
 
 export function WorkoutPage() {
+  const startWorkout = useWorkoutStore((state) => state.startWorkout);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -17,7 +21,10 @@ export function WorkoutPage() {
         <p className="text-muted-foreground">Select a routine or start empty.</p>
       </div>
 
-      <Button className="w-full h-14 text-lg font-semibold gap-2 shadow-lg shadow-primary/20">
+      <Button 
+        className="w-full h-14 text-lg font-semibold gap-2 shadow-lg shadow-primary/20"
+        onClick={() => startWorkout()}
+      >
         <Plus className="w-5 h-5" /> Start Empty Workout
       </Button>
 
@@ -33,7 +40,11 @@ export function WorkoutPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-4 pt-2">
-                <Button variant="secondary" className="w-full gap-2 mt-2">
+                <Button 
+                  variant="secondary" 
+                  className="w-full gap-2 mt-2"
+                  onClick={() => startWorkout(template as unknown as Workout)}
+                >
                   <Play className="w-4 h-4" /> Start Routine
                 </Button>
               </CardContent>
