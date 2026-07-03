@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
       { path: 'profile', element: <ProfilePage /> },
     ],
   },
-], { basename: import.meta.env.BASE_URL });
+], { basename: (import.meta as any).env.BASE_URL });
 
 export function AppRouter() {
   return <RouterProvider router={router} />;
