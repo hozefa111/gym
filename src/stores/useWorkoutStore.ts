@@ -48,13 +48,18 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const { activeWorkout } = get();
     if (!activeWorkout) return;
     
-    // Calculate calories
-    const profile = useProfileStore.getState().profile;
-    const caloriesBurned = profile ? calculateCalories(activeWorkout, profile) : 0;
-    
-    const completedWorkout = {
+    // Set endTime FIRST so calorie calculation can compute duration
+    const workoutWithEnd = {
       ...activeWorkout,
       endTime: new Date().toISOString(),
+    };
+    
+    // Calculate calories (needs endTime to compute duration)
+    const profile = useProfileStore.getState().profile;
+    const caloriesBurned = profile ? calculateCalories(workoutWithEnd, profile) : 0;
+    
+    const completedWorkout = {
+      ...workoutWithEnd,
       caloriesBurned,
     };
     
