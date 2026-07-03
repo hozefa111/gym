@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { WorkoutPage } from '@/pages/WorkoutPage';
@@ -6,7 +6,7 @@ import { HistoryPage } from '@/pages/HistoryPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   {
     path: '/',
     element: <AppShell />,
@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
       { path: 'profile', element: <ProfilePage /> },
     ],
   },
-], { basename: (import.meta as any).env.BASE_URL });
+]);
 
 export function AppRouter() {
   return <RouterProvider router={router} />;
