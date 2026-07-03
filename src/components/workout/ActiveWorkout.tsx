@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useWorkoutStore } from '@/stores/useWorkoutStore';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,23 @@ export function ActiveWorkout() {
   } = useWorkoutStore();
   
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState('00:00');
+
+  useEffect(() => {
+    if (!activeWorkout?.startTime) return;
+    
+    const interval = setInterval(() => {
+      const start = new Date(activeWorkout.startTime!).getTime();
+      const now = new Date().getTime();
+      const diff = Math.floor((now - start) / 1000);
+      
+      const mins = Math.floor(diff / 60).toString().padStart(2, '0');
+      const secs = (diff % 60).toString().padStart(2, '0');
+      setElapsedTime(`${mins}:${secs}`);
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [activeWorkout?.startTime]);
 
   if (!activeWorkout) return null;
 
@@ -37,7 +54,7 @@ export function ActiveWorkout() {
             <X className="w-6 h-6" />
           </Button>
           <Timer className="w-5 h-5 text-primary ml-2" />
-          <span className="font-mono text-lg font-bold">00:00</span>
+          <span className="font-mono text-lg font-bold">{elapsedTime}</span>
         </div>
         <Button onClick={endWorkout} className="font-bold">
           Finish
@@ -83,15 +100,19 @@ export function ActiveWorkout() {
                         type="number"
                         placeholder="--"
                         className="h-10 text-center font-mono text-lg bg-background"
-                        value={set.weight || ''}
-                        onChange={(e) => updateSet(workoutEx.id, set.id, { weight: parseFloat(e.target.value) })}
+                        value={set.weight === undefined ? '' : set.weight}
+                        onChange={(e) => updateSet(workoutEx.id, set.id, { 
+                          weight: e.target.value === '' ? undefined : parseFloat(e.target.value) 
+                        })}
                       />
                       <Input
                         type="number"
                         placeholder="--"
                         className="h-10 text-center font-mono text-lg bg-background"
-                        value={set.reps || ''}
-                        onChange={(e) => updateSet(workoutEx.id, set.id, { reps: parseInt(e.target.value) })}
+                        value={set.reps === undefined ? '' : set.reps}
+                        onChange={(e) => updateSet(workoutEx.id, set.id, { 
+                          reps: e.target.value === '' ? undefined : parseInt(e.target.value) 
+                        })}
                       />
                       <Button
                         variant={set.completed ? 'default' : 'secondary'}

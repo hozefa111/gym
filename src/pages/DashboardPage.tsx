@@ -3,9 +3,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '@/lib/db';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  
+  const workouts = useLiveQuery(() => db.workouts.toArray());
+  
+  const totalWorkouts = workouts?.length || 0;
+  
+  let totalVolume = 0;
+  workouts?.forEach(workout => {
+    workout.exercises.forEach(ex => {
+      ex.sets.forEach(set => {
+        if (set.completed && set.weight && set.reps) {
+          totalVolume += set.weight * set.reps;
+        }
+      });
+    });
+  });
+
+  const displayVolume = totalVolume > 1000 ? (totalVolume / 1000).toFixed(1) + 'k' : totalVolume.toString();
 
   return (
     <motion.div
@@ -35,13 +54,13 @@ export function DashboardPage() {
         <Card>
           <CardHeader className="p-4 pb-2">
             <CardDescription>Workouts</CardDescription>
-            <CardTitle className="text-2xl">12</CardTitle>
+            <CardTitle className="text-2xl">{workouts ? totalWorkouts : '--'}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="p-4 pb-2">
-            <CardDescription>Volume</CardDescription>
-            <CardTitle className="text-2xl">14.5k</CardTitle>
+            <CardDescription>Volume (kg)</CardDescription>
+            <CardTitle className="text-2xl">{workouts ? displayVolume : '--'}</CardTitle>
           </CardHeader>
         </Card>
       </div>
